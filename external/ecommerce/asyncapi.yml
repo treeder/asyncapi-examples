@@ -40,13 +40,6 @@ components:
       schema:
         type: integer
   messages:
-    httpOK:
-      payload:
-        type: object
-        properties:
-          status:
-            type: string
-            const: OK
     httpUnauthorized:
       payload:
         type: object
