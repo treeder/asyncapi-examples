@@ -1,0 +1,32 @@
+asyncapi: 2.0.0-rc2
+info:
+  title: Signup email service example (internal)
+  version: 0.1.0
+servers:
+  broker:
+    url: broker.example.com
+    protocol: amqp
+
+channels:
+  /user/signedup:
+    publish:
+      message:
+        $ref: 'signup.yml#/components/messages/userSignedUp'
+      bindings:
+        $ref: 'signup.yml#/components/operationBindings/publicExchange'
+  /email/sent:
+    subscribe:
+      message:
+        $ref: '#/components/messages/emailSent'
+
+components:
+  messages:
+    emailSent:
+      payload:
+        type: object
+        properties:
+          email:
+            type: string
+          timestamp:
+            type: string
+            format: date-time

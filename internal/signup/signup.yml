@@ -1,0 +1,95 @@
+asyncapi: 2.0.0-rc2
+info:
+  title: Signup service example (internal)
+  version: 0.1.0
+servers:
+  broker:
+    url: broker.example.com
+    protocol: amqp
+  http:
+    url: signup.example.com
+    protocol: http
+
+channels:
+  /users:
+    publish:
+      message:
+        $ref: '#/components/messages/createUser'
+      bindings:
+        $ref: '#/components/operationBindings/restAPI'
+  /user/signedup:
+    subscribe:
+      message:
+        $ref: '#/components/messages/userSignedUp'
+      bindings:
+        $ref: '#/components/operationBindings/publicExchange'
+
+components:
+  messages:
+    createUser:
+      payload:
+        type: object
+        properties:
+          email:
+            type: string
+            format: email
+          fullName:
+            type: string
+    createUserResponse:
+      payload:
+        type: object
+        properties:
+          id:
+            type: integer
+          email:
+            type: string
+            format: email
+          fullName:
+            type: string
+    httpUnexpectedError:
+      payload:
+        type: object
+        properties:
+          status:
+            type: string
+            const: Unexpected error
+    userSignedUp:
+      payload:
+        type: object
+        properties:
+          id:
+            type: integer
+          email:
+            type: string
+            format: email
+          fullName:
+            type: string
+          timestamp:
+            type: string
+            format: date-time
+  operationBindings:
+    publicExchange:
+      amqp:
+        exchange:
+          name: public
+          type: topic
+          durable: true
+        queue:
+          durable: false
+          exclusive: true
+          bindingKey: 'user.signedup' # Default could be the channel name? (replacing / with .)
+          deliveryMode: 2
+        bindingVersion: 0.2.0 # 0.2.0 doesn't exist yet
+    
+    restAPI:
+      http:
+        POST:
+          requestBody: '$message#'
+          responses:
+            '200':
+              $ref: '#/components/messages/createUserResponse'
+            default:
+              code: 500
+              message:
+                $ref: '#/components/messages/httpUnexpectedError'
+        bindingVersion: 0.2.0 # 0.2.0 doesn't exist yet

@@ -1,0 +1,59 @@
+asyncapi: 2.0.0-rc2
+info:
+  title: Signup service example (external)
+  version: 0.1.0
+servers:
+  http:
+    url: signup.example.com
+    protocol: http
+
+channels:
+  /users:
+    publish:
+      message:
+        $ref: '#/components/messages/createUser'
+      bindings:
+        $ref: '#/components/operationBindings/restAPI'
+
+components:
+  messages:
+    createUser:
+      payload:
+        type: object
+        properties:
+          email:
+            type: string
+            format: email
+          fullName:
+            type: string
+    createUserResponse:
+      payload:
+        type: object
+        properties:
+          id:
+            type: integer
+          email:
+            type: string
+            format: email
+          fullName:
+            type: string
+    httpUnexpectedError:
+      payload:
+        type: object
+        properties:
+          status:
+            type: string
+            const: Unexpected error
+  operationBindings:
+    restAPI:
+      http:
+        POST:
+          requestBody: '$message#'
+          responses:
+            '200':
+              $ref: '#/components/messages/createUserResponse'
+            default:
+              code: 500
+              message:
+                $ref: '#/components/messages/httpUnexpectedError'
+        bindingVersion: 0.2.0 # 0.2.0 doesn't exist yet
