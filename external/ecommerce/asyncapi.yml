@@ -15,9 +15,9 @@ channels:
     parameters:
       id:
         $ref: '#/components/parameters/id'
+    message:
+      $ref: '#/components/messages/orderStatus'
     subscribe:
-      message:
-        $ref: '#/components/messages/orderStatus'
       bindings:
         $ref: '#/components/operationBindings/orderStatus'
 
@@ -27,11 +27,12 @@ channels:
         description: Id of the delivery
         schema:
           type: integer
+    message:
+      $ref: '#/components/messages/createOrder'
     publish:
       bindings:
         $ref: '#/components/operationBindings/orders'
-      message:
-        $ref: '#/components/messages/createOrder'
+      
 
 components:
   parameters:
